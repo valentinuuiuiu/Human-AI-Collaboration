@@ -1,0 +1,494 @@
+{
+  "displayName": "MCP-Enhanced Research Assistant",
+  "description": "Advanced research workflow using MCP servers for tool-enhanced LLM capabilities",
+  "version": "1.0.0",
+  "trigger": {
+    "name": "research_request",
+    "type": "webhook",
+    "settings": {
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Research query or question"
+          },
+          "depth": {
+            "type": "string",
+            "enum": ["basic", "comprehensive", "expert"],
+            "default": "comprehensive"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["web", "files", "databases"]
+            }
+          },
+          "outputFormat": {
+            "type": "string",
+            "enum": ["report", "summary", "json"],
+            "default": "report"
+          }
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  "steps": [
+    {
+      "name": "setup_mcp_servers",
+      "displayName": "Setup MCP Servers",
+      "type": "parallel",
+      "steps": [
+        {
+          "name": "setup_web_search",
+          "type": "mcp_server.setup_mcp_server",
+          "settings": {
+            "serverName": "web_search",
+            "serverType": "web_search",
+            "command": "npx",
+            "args": [
+              { "arg": "@modelcontextprotocol/server-brave-search" }
+            ],
+            "environment": {
+              "BRAVE_API_KEY": "{{secrets.brave_api_key}}"
+            },
+            "autoConnect": true,
+            "testConnection": true
+          }
+        },
+        {
+          "name": "setup_filesystem",
+          "type": "mcp_server.setup_mcp_server",
+          "settings": {
+            "serverName": "filesystem",
+            "serverType": "filesystem",
+            "command": "npx",
+            "args": [
+              { "arg": "@modelcontextprotocol/server-filesystem" },
+              { "arg": "/workspace/research" }
+            ],
+            "autoConnect": true,
+            "testConnection": true
+          }
+        },
+        {
+          "name": "setup_database",
+          "type": "mcp_server.setup_mcp_server",
+          "settings": {
+            "serverName": "database",
+            "serverType": "database",
+            "command": "npx",
+            "args": [
+              { "arg": "@modelcontextprotocol/server-sqlite" },
+              { "arg": "/workspace/research.db" }
+            ],
+            "autoConnect": true,
+            "testConnection": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "research_planning",
+      "displayName": "Research Planning & Strategy",
+      "type": "llm_orchestrator.chain_llm_calls",
+      "settings": {
+        "providers": [
+          {
+            "name": "research_planner",
+            "type": "openai",
+            "apiKey": "{{secrets.openai_api_key}}",
+            "model": "gpt-4"
+          }
+        ],
+        "calls": [
+          {
+            "name": "analyze_query",
+            "provider": "research_planner",
+            "systemPrompt": "You are a research planning expert. Analyze research queries and create comprehensive research strategies.",
+            "userPrompt": "Analyze this research query and create a detailed research plan:\n\nQuery: {{query}}\nDepth: {{depth}}\nSources: {{sources}}\n\nProvide:\n1. Key research questions to answer\n2. Information sources to prioritize\n3. Search strategies and keywords\n4. Expected challenges and limitations\n5. Success criteria\n6. Recommended tools and methods\n\nFormat as a structured research plan.",
+            "variables": {
+              "query": "{{trigger.body.query}}",
+              "depth": "{{trigger.body.depth}}",
+              "sources": "{{trigger.body.sources}}"
+            },
+            "passResultAs": "research_plan"
+          },
+          {
+            "name": "generate_search_queries",
+            "provider": "research_planner",
+            "systemPrompt": "You are a search query optimization expert. Generate effective search queries for comprehensive research.",
+            "userPrompt": "Based on this research plan:\n\n{{research_plan}}\n\nGenerate 10-15 optimized search queries that will help gather comprehensive information. Include:\n1. Primary queries for main topics\n2. Secondary queries for related concepts\n3. Specific queries for data and statistics\n4. Queries for different perspectives\n5. Queries for recent developments\n\nFormat as JSON array of search queries with descriptions.",
+            "variables": {},
+            "useContextFrom": "analyze_query",
+            "passResultAs": "search_queries"
+          }
+        ]
+      }
+    },
+    {
+      "name": "information_gathering",
+      "displayName": "Multi-Source Information Gathering",
+      "type": "parallel",
+      "steps": [
+        {
+          "name": "web_research",
+          "type": "loop",
+          "settings": {
+            "items": "{{JSON.parse(research_planning.results[1].content).slice(0, 5)}}",
+            "steps": [
+              {
+                "name": "search_web",
+                "type": "mcp_server.call_mcp_tool",
+                "settings": {
+                  "serverName": "web_search",
+                  "toolName": "brave_web_search",
+                  "arguments": {
+                    "query": "{{item.query}}",
+                    "count": 10
+                  },
+                  "timeout": 30,
+                  "includeMetadata": true
+                }
+              },
+              {
+                "name": "save_results",
+                "type": "mcp_server.call_mcp_tool",
+                "settings": {
+                  "serverName": "filesystem",
+                  "toolName": "write_file",
+                  "arguments": {
+                    "path": "/workspace/research/web_{{@index}}.json",
+                    "contents": "{{JSON.stringify(search_web.content)}}"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "file_research",
+          "type": "conditional",
+          "condition": "{{trigger.body.sources.includes('files')}}",
+          "steps": [
+            {
+              "name": "list_research_files",
+              "type": "mcp_server.call_mcp_tool",
+              "settings": {
+                "serverName": "filesystem",
+                "toolName": "list_directory",
+                "arguments": {
+                  "path": "/workspace/research/documents"
+                }
+              }
+            },
+            {
+              "name": "analyze_files",
+              "type": "loop",
+              "settings": {
+                "items": "{{list_research_files.content[0].content.split('\\n').slice(0, 10)}}",
+                "steps": [
+                  {
+                    "name": "read_file",
+                    "type": "mcp_server.call_mcp_tool",
+                    "settings": {
+                      "serverName": "filesystem",
+                      "toolName": "read_file",
+                      "arguments": {
+                        "path": "/workspace/research/documents/{{item}}"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "information_synthesis",
+      "displayName": "Information Analysis & Synthesis",
+      "type": "llm_orchestrator.chain_llm_calls",
+      "settings": {
+        "providers": [
+          {
+            "name": "analyst",
+            "type": "openai",
+            "apiKey": "{{secrets.openai_api_key}}",
+            "model": "gpt-4"
+          },
+          {
+            "name": "synthesizer",
+            "type": "anthropic",
+            "apiKey": "{{secrets.anthropic_api_key}}",
+            "model": "claude-3-sonnet-20240229"
+          }
+        ],
+        "calls": [
+          {
+            "name": "analyze_web_results",
+            "provider": "analyst",
+            "systemPrompt": "You are a research analyst. Analyze web search results and extract key insights, facts, and patterns.",
+            "userPrompt": "Analyze these web search results for the query: {{query}}\n\nResults: {{web_results}}\n\nExtract:\n1. Key facts and statistics\n2. Main themes and patterns\n3. Different perspectives and viewpoints\n4. Credible sources and citations\n5. Gaps in information\n6. Conflicting information\n\nProvide structured analysis with source attribution.",
+            "variables": {
+              "query": "{{trigger.body.query}}",
+              "web_results": "{{information_gathering.web_research}}"
+            },
+            "passResultAs": "web_analysis"
+          },
+          {
+            "name": "synthesize_findings",
+            "provider": "synthesizer",
+            "systemPrompt": "You are a research synthesizer. Combine multiple information sources into coherent, comprehensive insights.",
+            "userPrompt": "Synthesize these research findings:\n\nOriginal Query: {{query}}\nWeb Analysis: {{web_analysis}}\nFile Analysis: {{file_analysis}}\n\nCreate a comprehensive synthesis that:\n1. Answers the original research question\n2. Presents multiple perspectives\n3. Identifies consensus and disagreements\n4. Highlights key insights and implications\n5. Notes limitations and uncertainties\n6. Suggests areas for further research\n\nStructure as a coherent research synthesis.",
+            "variables": {
+              "query": "{{trigger.body.query}}",
+              "file_analysis": "{{information_gathering.file_research || 'No file analysis performed'}}"
+            },
+            "useContextFrom": "analyze_web_results",
+            "passResultAs": "synthesis"
+          }
+        ]
+      }
+    },
+    {
+      "name": "fact_verification",
+      "displayName": "Fact Checking & Verification",
+      "type": "llm_orchestrator.multi_provider_query",
+      "settings": {
+        "providers": [
+          {
+            "name": "fact_checker_1",
+            "type": "openai",
+            "apiKey": "{{secrets.openai_api_key}}",
+            "model": "gpt-4",
+            "weight": 2
+          },
+          {
+            "name": "fact_checker_2",
+            "type": "anthropic",
+            "apiKey": "{{secrets.anthropic_api_key}}",
+            "model": "claude-3-sonnet-20240229",
+            "weight": 2
+          }
+        ],
+        "systemPrompt": "You are a fact-checking expert. Verify claims and identify potential inaccuracies in research findings.",
+        "userPrompt": "Fact-check this research synthesis:\n\n{{synthesis}}\n\nFor each major claim:\n1. Assess credibility (High/Medium/Low)\n2. Identify supporting evidence\n3. Note any contradictions\n4. Flag claims needing verification\n5. Suggest additional sources\n\nProvide a fact-checking report with confidence levels.",
+        "variables": {
+          "synthesis": "{{information_synthesis.results[1].content}}"
+        },
+        "compareResponses": true,
+        "executionMode": "parallel"
+      }
+    },
+    {
+      "name": "generate_visualizations",
+      "displayName": "Generate Data Visualizations",
+      "type": "conditional",
+      "condition": "{{trigger.body.includeVisualizations}}",
+      "steps": [
+        {
+          "name": "extract_data",
+          "type": "llm_orchestrator.chain_llm_calls",
+          "settings": {
+            "providers": [
+              {
+                "name": "data_extractor",
+                "type": "openai",
+                "apiKey": "{{secrets.openai_api_key}}",
+                "model": "gpt-4"
+              }
+            ],
+            "calls": [
+              {
+                "name": "identify_visualizable_data",
+                "provider": "data_extractor",
+                "systemPrompt": "You are a data visualization expert. Identify data that can be effectively visualized.",
+                "userPrompt": "Analyze this research synthesis and identify data suitable for visualization:\n\n{{synthesis}}\n\nExtract:\n1. Numerical data and statistics\n2. Trends and patterns over time\n3. Comparisons and relationships\n4. Categories and distributions\n5. Geographic data\n\nFor each dataset, suggest appropriate visualization types (charts, graphs, maps, etc.).\n\nFormat as JSON with data and visualization recommendations.",
+                "variables": {
+                  "synthesis": "{{information_synthesis.results[1].content}}"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "create_chart_data",
+          "type": "mcp_server.call_mcp_tool",
+          "settings": {
+            "serverName": "filesystem",
+            "toolName": "write_file",
+            "arguments": {
+              "path": "/workspace/research/chart_data.json",
+              "contents": "{{extract_data.results[0].content}}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "format_output",
+      "displayName": "Format Final Output",
+      "type": "llm_orchestrator.content_generation_pipeline",
+      "settings": {
+        "generationProvider": {
+          "name": "formatter",
+          "type": "openai",
+          "apiKey": "{{secrets.openai_api_key}}",
+          "model": "gpt-4"
+        },
+        "contentType": "{{trigger.body.outputFormat}}",
+        "topic": "Research Report: {{trigger.body.query}}",
+        "audience": "professional researchers and decision makers",
+        "tone": "professional",
+        "length": "long",
+        "additionalRequirements": "Format as {{trigger.body.outputFormat}}.\n\nInclude:\n- Executive summary\n- Detailed findings\n- Source citations\n- Fact-checking results\n- Limitations and uncertainties\n{{#if trigger.body.includeVisualizations}}- Data visualizations and charts{{/if}}\n\nBase content on:\nSynthesis: {{information_synthesis.results[1].content}}\nFact-checking: {{fact_verification.bestResponse.content}}",
+        "enableReview": true,
+        "enableRefinement": true,
+        "outputFormat": "markdown"
+      }
+    },
+    {
+      "name": "save_research_output",
+      "displayName": "Save Research Output",
+      "type": "parallel",
+      "steps": [
+        {
+          "name": "save_report",
+          "type": "mcp_server.call_mcp_tool",
+          "settings": {
+            "serverName": "filesystem",
+            "toolName": "write_file",
+            "arguments": {
+              "path": "/workspace/research/final_report.md",
+              "contents": "{{format_output.content}}"
+            }
+          }
+        },
+        {
+          "name": "save_metadata",
+          "type": "mcp_server.call_mcp_tool",
+          "settings": {
+            "serverName": "database",
+            "toolName": "execute_query",
+            "arguments": {
+              "query": "INSERT INTO research_sessions (query, timestamp, sources, output_format, quality_score) VALUES (?, ?, ?, ?, ?)",
+              "params": [
+                "{{trigger.body.query}}",
+                "{{new Date().toISOString()}}",
+                "{{JSON.stringify(trigger.body.sources)}}",
+                "{{trigger.body.outputFormat}}",
+                "{{format_output.metadata.qualityScore || 85}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "output": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Original research query"
+        },
+        "report": {
+          "type": "string",
+          "description": "Final formatted research report"
+        },
+        "synthesis": {
+          "type": "string",
+          "description": "Research synthesis and analysis"
+        },
+        "factCheck": {
+          "type": "object",
+          "description": "Fact-checking results and verification"
+        },
+        "sources": {
+          "type": "array",
+          "description": "Information sources used"
+        },
+        "visualizations": {
+          "type": "object",
+          "description": "Data visualizations and charts"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "executionTime": {
+              "type": "number",
+              "description": "Total execution time in milliseconds"
+            },
+            "qualityScore": {
+              "type": "number",
+              "description": "Research quality score (1-100)"
+            },
+            "sourcesCount": {
+              "type": "number",
+              "description": "Number of sources analyzed"
+            },
+            "toolsUsed": {
+              "type": "array",
+              "description": "MCP tools utilized"
+            },
+            "costs": {
+              "type": "object",
+              "description": "LLM usage costs"
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": ["research", "mcp", "llm", "analysis", "automation"],
+  "category": "Research & Analysis",
+  "complexity": "Expert",
+  "estimatedExecutionTime": "5-10 minutes",
+  "requiredCredentials": [
+    "openai_api_key",
+    "anthropic_api_key",
+    "brave_api_key"
+  ],
+  "mcpServers": [
+    {
+      "name": "web_search",
+      "package": "@modelcontextprotocol/server-brave-search",
+      "description": "Web search capabilities using Brave Search API"
+    },
+    {
+      "name": "filesystem",
+      "package": "@modelcontextprotocol/server-filesystem",
+      "description": "File system operations for document analysis"
+    },
+    {
+      "name": "database",
+      "package": "@modelcontextprotocol/server-sqlite",
+      "description": "Database operations for metadata storage"
+    }
+  ],
+  "documentation": {
+    "description": "Advanced research assistant that combines multiple LLM providers with MCP servers for enhanced tool capabilities. Performs comprehensive research using web search, file analysis, and database operations.",
+    "features": [
+      "Multi-source information gathering",
+      "Intelligent research planning",
+      "Fact verification and cross-checking",
+      "Data visualization generation",
+      "Multiple output formats",
+      "Source attribution and citations",
+      "Quality assurance and review"
+    ],
+    "useCases": [
+      "Academic research",
+      "Market analysis",
+      "Competitive intelligence",
+      "Due diligence",
+      "Policy research",
+      "Technical documentation"
+    ]
+  }
+}

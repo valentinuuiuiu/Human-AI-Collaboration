@@ -1,0 +1,427 @@
+{
+  "displayName": "Content Marketing Automation",
+  "description": "Complete content marketing pipeline from research to publication",
+  "version": "1.0.0",
+  "trigger": {
+    "name": "webhook_trigger",
+    "type": "webhook",
+    "settings": {
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "Main topic for content creation"
+          },
+          "contentTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["blog_post", "social_media", "email_newsletter", "video_script"]
+            },
+            "description": "Types of content to generate"
+          },
+          "targetAudience": {
+            "type": "string",
+            "description": "Target audience description"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "SEO keywords to include"
+          },
+          "brandGuidelines": {
+            "type": "object",
+            "properties": {
+              "tone": {
+                "type": "string",
+                "enum": ["professional", "casual", "friendly", "authoritative"]
+              },
+              "style": {
+                "type": "string"
+              },
+              "restrictions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": ["topic", "contentTypes", "targetAudience"]
+      }
+    }
+  },
+  "steps": [
+    {
+      "name": "research_phase",
+      "displayName": "Topic Research & Trend Analysis",
+      "type": "llm_orchestrator.chain_llm_calls",
+      "settings": {
+        "providers": [
+          {
+            "name": "researcher",
+            "type": "openai",
+            "apiKey": "{{secrets.openai_api_key}}",
+            "model": "gpt-4"
+          },
+          {
+            "name": "trend_analyzer",
+            "type": "anthropic",
+            "apiKey": "{{secrets.anthropic_api_key}}",
+            "model": "claude-3-sonnet-20240229"
+          }
+        ],
+        "calls": [
+          {
+            "name": "topic_research",
+            "provider": "researcher",
+            "systemPrompt": "You are a professional content researcher. Provide comprehensive research on topics with current trends, statistics, and insights.",
+            "userPrompt": "Research the topic: {{topic}}\n\nTarget audience: {{targetAudience}}\n\nProvide:\n1. Current trends and developments\n2. Key statistics and data points\n3. Popular subtopics and angles\n4. Competitor analysis\n5. Content gaps and opportunities\n\nFormat as structured research brief.",
+            "variables": {
+              "topic": "{{trigger.body.topic}}",
+              "targetAudience": "{{trigger.body.targetAudience}}"
+            },
+            "passResultAs": "research_brief"
+          },
+          {
+            "name": "trend_analysis",
+            "provider": "trend_analyzer",
+            "systemPrompt": "You are a trend analysis expert. Analyze research data and identify emerging trends and opportunities.",
+            "userPrompt": "Based on this research:\n\n{{research_brief}}\n\nAnalyze:\n1. Emerging trends in this space\n2. Content opportunities\n3. Audience interests and pain points\n4. Recommended content angles\n5. SEO opportunities\n\nProvide actionable insights for content creation.",
+            "variables": {},
+            "useContextFrom": "topic_research",
+            "passResultAs": "trend_analysis"
+          }
+        ],
+        "trackCosts": true
+      }
+    },
+    {
+      "name": "content_strategy",
+      "displayName": "Content Strategy Development",
+      "type": "llm_orchestrator.multi_provider_query",
+      "settings": {
+        "providers": [
+          {
+            "name": "strategist_1",
+            "type": "openai",
+            "apiKey": "{{secrets.openai_api_key}}",
+            "model": "gpt-4",
+            "weight": 2
+          },
+          {
+            "name": "strategist_2",
+            "type": "anthropic",
+            "apiKey": "{{secrets.anthropic_api_key}}",
+            "model": "claude-3-sonnet-20240229",
+            "weight": 2
+          }
+        ],
+        "systemPrompt": "You are a content strategy expert. Create comprehensive content strategies based on research insights.",
+        "userPrompt": "Create a content strategy for:\n\nTopic: {{topic}}\nContent Types: {{contentTypes}}\nTarget Audience: {{targetAudience}}\nKeywords: {{keywords}}\nBrand Guidelines: {{brandGuidelines}}\n\nResearch Insights:\n{{research_brief}}\n\nTrend Analysis:\n{{trend_analysis}}\n\nProvide:\n1. Content calendar outline\n2. Key messaging framework\n3. Content pillars and themes\n4. Distribution strategy\n5. Success metrics\n\nFormat as JSON strategy document.",
+        "variables": {
+          "topic": "{{trigger.body.topic}}",
+          "contentTypes": "{{trigger.body.contentTypes}}",
+          "targetAudience": "{{trigger.body.targetAudience}}",
+          "keywords": "{{trigger.body.keywords}}",
+          "brandGuidelines": "{{trigger.body.brandGuidelines}}",
+          "research_brief": "{{research_phase.results[0].content}}",
+          "trend_analysis": "{{research_phase.results[1].content}}"
+        },
+        "compareResponses": true,
+        "selectBest": true,
+        "selectionCriteria": {
+          "considerLatency": false,
+          "preferredLength": 2000
+        }
+      }
+    },
+    {
+      "name": "content_generation",
+      "displayName": "Multi-Format Content Generation",
+      "type": "llm_orchestrator.content_generation_pipeline",
+      "settings": {
+        "generationProvider": {
+          "name": "content_creator",
+          "type": "openai",
+          "apiKey": "{{secrets.openai_api_key}}",
+          "model": "gpt-4"
+        },
+        "reviewProvider": {
+          "name": "content_reviewer",
+          "type": "anthropic",
+          "apiKey": "{{secrets.anthropic_api_key}}",
+          "model": "claude-3-sonnet-20240229"
+        },
+        "contentType": "{{trigger.body.contentTypes[0]}}",
+        "topic": "{{trigger.body.topic}}",
+        "audience": "{{trigger.body.targetAudience}}",
+        "tone": "{{trigger.body.brandGuidelines.tone}}",
+        "length": "long",
+        "keywords": "{{trigger.body.keywords}}",
+        "additionalRequirements": "Follow brand guidelines: {{trigger.body.brandGuidelines}}\n\nIncorporate research insights: {{research_phase.results[0].content}}\n\nAlign with strategy: {{content_strategy.bestResponse.content}}",
+        "enableReview": true,
+        "enableRefinement": true,
+        "maxRefinementIterations": 2,
+        "reviewCriteria": [
+          {
+            "criterion": "Brand alignment and tone consistency",
+            "weight": 9
+          },
+          {
+            "criterion": "SEO optimization and keyword integration",
+            "weight": 8
+          },
+          {
+            "criterion": "Audience engagement and value",
+            "weight": 10
+          },
+          {
+            "criterion": "Factual accuracy and credibility",
+            "weight": 9
+          },
+          {
+            "criterion": "Call-to-action effectiveness",
+            "weight": 7
+          }
+        ],
+        "outputFormat": "markdown",
+        "includeMetadata": true
+      }
+    },
+    {
+      "name": "seo_optimization",
+      "displayName": "SEO Optimization & Enhancement",
+      "type": "llm_orchestrator.chain_llm_calls",
+      "settings": {
+        "providers": [
+          {
+            "name": "seo_specialist",
+            "type": "openai",
+            "apiKey": "{{secrets.openai_api_key}}",
+            "model": "gpt-4"
+          }
+        ],
+        "calls": [
+          {
+            "name": "seo_analysis",
+            "provider": "seo_specialist",
+            "systemPrompt": "You are an SEO expert. Analyze content for SEO optimization opportunities and provide specific recommendations.",
+            "userPrompt": "Analyze this content for SEO optimization:\n\n{{content}}\n\nTarget keywords: {{keywords}}\nTarget audience: {{audience}}\n\nProvide:\n1. SEO score (1-100)\n2. Keyword density analysis\n3. Meta title and description suggestions\n4. Header structure recommendations\n5. Internal linking opportunities\n6. Content improvements for SEO\n\nFormat as detailed SEO audit report.",
+            "variables": {
+              "content": "{{content_generation.content}}",
+              "keywords": "{{trigger.body.keywords}}",
+              "audience": "{{trigger.body.targetAudience}}"
+            },
+            "passResultAs": "seo_audit"
+          },
+          {
+            "name": "seo_enhancement",
+            "provider": "seo_specialist",
+            "systemPrompt": "You are an SEO content optimizer. Enhance content based on SEO audit recommendations while maintaining quality and readability.",
+            "userPrompt": "Optimize this content based on the SEO audit:\n\nOriginal content:\n{{content}}\n\nSEO Audit:\n{{seo_audit}}\n\nEnhance the content to:\n1. Improve SEO score\n2. Better integrate target keywords naturally\n3. Optimize headers and structure\n4. Add meta elements\n5. Maintain readability and engagement\n\nProvide the optimized version with SEO enhancements.",
+            "variables": {
+              "content": "{{content_generation.content}}"
+            },
+            "useContextFrom": "seo_analysis",
+            "passResultAs": "optimized_content"
+          }
+        ]
+      }
+    },
+    {
+      "name": "quality_assurance",
+      "displayName": "Final Quality Review",
+      "type": "llm_orchestrator.multi_provider_query",
+      "settings": {
+        "providers": [
+          {
+            "name": "qa_reviewer_1",
+            "type": "openai",
+            "apiKey": "{{secrets.openai_api_key}}",
+            "model": "gpt-4",
+            "weight": 1
+          },
+          {
+            "name": "qa_reviewer_2",
+            "type": "anthropic",
+            "apiKey": "{{secrets.anthropic_api_key}}",
+            "model": "claude-3-sonnet-20240229",
+            "weight": 1
+          }
+        ],
+        "systemPrompt": "You are a content quality assurance specialist. Perform final review of content before publication.",
+        "userPrompt": "Perform final QA review of this content:\n\n{{optimized_content}}\n\nOriginal requirements:\n- Topic: {{topic}}\n- Audience: {{audience}}\n- Brand guidelines: {{brandGuidelines}}\n- Keywords: {{keywords}}\n\nCheck for:\n1. Factual accuracy\n2. Brand compliance\n3. Grammar and style\n4. Audience appropriateness\n5. Call-to-action effectiveness\n6. Overall quality score (1-100)\n\nProvide:\n- Approval status (APPROVED/NEEDS_REVISION)\n- Quality score\n- Any final recommendations\n- Publication readiness assessment",
+        "variables": {
+          "optimized_content": "{{seo_optimization.results[1].content}}",
+          "topic": "{{trigger.body.topic}}",
+          "audience": "{{trigger.body.targetAudience}}",
+          "brandGuidelines": "{{trigger.body.brandGuidelines}}",
+          "keywords": "{{trigger.body.keywords}}"
+        },
+        "compareResponses": true,
+        "executionMode": "parallel"
+      }
+    },
+    {
+      "name": "format_outputs",
+      "displayName": "Format Final Outputs",
+      "type": "code",
+      "settings": {
+        "sourceCode": {
+          "javascript": `
+            // Process and format all outputs
+            const finalContent = steps.seo_optimization.results[1].content;
+            const qaResults = steps.quality_assurance.results;
+            const strategy = JSON.parse(steps.content_strategy.bestResponse.content);
+            
+            // Calculate overall quality score
+            const qualityScores = qaResults.map(r => {
+              const match = r.content.match(/quality score[:\\s]*(\\d+)/i);
+              return match ? parseInt(match[1]) : 75;
+            });
+            const avgQualityScore = qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length;
+            
+            // Determine approval status
+            const approvalStatuses = qaResults.map(r => 
+              r.content.toLowerCase().includes('approved') ? 'APPROVED' : 'NEEDS_REVISION'
+            );
+            const finalApproval = approvalStatuses.every(status => status === 'APPROVED') ? 'APPROVED' : 'NEEDS_REVISION';
+            
+            // Extract metadata
+            const metadata = steps.content_generation.metadata;
+            const seoAudit = steps.seo_optimization.results[0].content;
+            
+            return {
+              content: {
+                final: finalContent,
+                original: steps.content_generation.content,
+                type: steps.trigger.body.contentTypes[0]
+              },
+              quality: {
+                score: Math.round(avgQualityScore),
+                approval: finalApproval,
+                reviews: qaResults.map(r => r.content)
+              },
+              seo: {
+                audit: seoAudit,
+                optimized: true
+              },
+              strategy: strategy,
+              metadata: {
+                ...metadata,
+                totalCost: steps.research_phase.summary.totalCost + 
+                          steps.content_strategy.summary.totalCost + 
+                          steps.content_generation.pipeline.totalCost + 
+                          steps.seo_optimization.summary.totalCost,
+                processingTime: Date.now() - steps.trigger.timestamp,
+                keywords: steps.trigger.body.keywords,
+                audience: steps.trigger.body.targetAudience
+              },
+              readyForPublication: finalApproval === 'APPROVED' && avgQualityScore >= 80
+            };
+          `
+        }
+      }
+    }
+  ],
+  "output": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "object",
+          "properties": {
+            "final": {
+              "type": "string",
+              "description": "Final optimized content ready for publication"
+            },
+            "original": {
+              "type": "string",
+              "description": "Original generated content before optimization"
+            },
+            "type": {
+              "type": "string",
+              "description": "Content type"
+            }
+          }
+        },
+        "quality": {
+          "type": "object",
+          "properties": {
+            "score": {
+              "type": "number",
+              "description": "Overall quality score (1-100)"
+            },
+            "approval": {
+              "type": "string",
+              "enum": ["APPROVED", "NEEDS_REVISION"],
+              "description": "Final approval status"
+            },
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Detailed quality review feedback"
+            }
+          }
+        },
+        "seo": {
+          "type": "object",
+          "properties": {
+            "audit": {
+              "type": "string",
+              "description": "SEO audit report"
+            },
+            "optimized": {
+              "type": "boolean",
+              "description": "Whether content has been SEO optimized"
+            }
+          }
+        },
+        "strategy": {
+          "type": "object",
+          "description": "Content strategy document"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Content generation metadata and analytics"
+        },
+        "readyForPublication": {
+          "type": "boolean",
+          "description": "Whether content is ready for publication"
+        }
+      }
+    }
+  },
+  "tags": ["content", "marketing", "automation", "llm", "seo"],
+  "category": "Marketing",
+  "complexity": "Advanced",
+  "estimatedExecutionTime": "3-5 minutes",
+  "requiredCredentials": [
+    "openai_api_key",
+    "anthropic_api_key"
+  ],
+  "documentation": {
+    "description": "This workflow automates the entire content marketing process from initial research to publication-ready content. It uses multiple LLM providers to ensure high-quality output through research, strategy development, content generation, SEO optimization, and quality assurance.",
+    "useCases": [
+      "Blog post creation",
+      "Social media content",
+      "Email newsletters",
+      "Marketing copy",
+      "SEO-optimized articles"
+    ],
+    "benefits": [
+      "Consistent brand voice",
+      "SEO optimization",
+      "Quality assurance",
+      "Cost-effective scaling",
+      "Data-driven insights"
+    ]
+  }
+}

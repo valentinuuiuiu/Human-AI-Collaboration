@@ -1,0 +1,49 @@
+{
+  "name": "human-ai-collaboration",
+  "version": "1.0.0",
+  "description": "Advanced LLM orchestration tools and workflows for seamless Human-AI collaboration",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run build:llm-orchestrator && npm run build:mcp-server",
+    "build:llm-orchestrator": "cd llm-orchestrator && npm run build",
+    "build:mcp-server": "cd mcp-server && npm run build",
+    "install:all": "npm install && cd llm-orchestrator && npm install && cd ../mcp-server && npm install",
+    "test": "echo \"Tests coming soon!\" && exit 0",
+    "lint": "echo \"Linting coming soon!\" && exit 0"
+  },
+  "keywords": [
+    "llm",
+    "ai",
+    "automation",
+    "workflow",
+    "activepieces",
+    "flowise",
+    "n8n",
+    "mcp",
+    "openai",
+    "anthropic",
+    "collaboration"
+  ],
+  "author": "Human-AI Collaboration Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/valentinuuiuiu/Human-AI-Collaboration.git"
+  },
+  "bugs": {
+    "url": "https://github.com/valentinuuiuiu/Human-AI-Collaboration/issues"
+  },
+  "homepage": "https://github.com/valentinuuiuiu/Human-AI-Collaboration#readme",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@activepieces/pieces-framework": "^0.20.0",
+    "openai": "^4.0.0",
+    "@anthropic-ai/sdk": "^0.24.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "uuid": "^9.0.0",
+    "zod": "^3.22.0"
+  }
+}
