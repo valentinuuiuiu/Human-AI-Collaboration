@@ -1,96 +1,104 @@
-import { createAction, Property } from '@activepieces/pieces-framework';
-import OpenAI from 'openai';
+import { LLMProviderManager } from '../common/providers';
+import { LLMProviderType } from '../common/types';
 
-export const simpleLLMCall = createAction({
-  name: 'simple_llm_call',
-  displayName: 'Simple LLM Call',
-  description: 'Make a simple call to OpenAI GPT models',
-  props: {
-    apiKey: Property.ShortText({
-      displayName: 'OpenAI API Key',
-      required: true,
-      description: 'Your OpenAI API key'
-    }),
-    model: Property.ShortText({
-      displayName: 'Model',
-      required: true,
-      defaultValue: 'gpt-4',
-      description: 'OpenAI model to use (e.g., gpt-4, gpt-3.5-turbo)'
-    }),
-    systemPrompt: Property.LongText({
-      displayName: 'System Prompt',
-      required: false,
-      description: 'System prompt to set the behavior of the assistant'
-    }),
-    userPrompt: Property.LongText({
-      displayName: 'User Prompt',
-      required: true,
-      description: 'The main prompt/question for the LLM'
-    }),
-    temperature: Property.Number({
-      displayName: 'Temperature',
-      required: false,
-      defaultValue: 0.7,
-      description: 'Controls randomness (0.0 to 2.0). Lower values make output more focused and deterministic.'
-    }),
-    maxTokens: Property.Number({
-      displayName: 'Max Tokens',
-      required: false,
-      defaultValue: 1000,
-      description: 'Maximum number of tokens to generate in the response'
-    }),
-    includeUsage: Property.Checkbox({
-      displayName: 'Include Usage Stats',
-      required: false,
-      defaultValue: true,
-      description: 'Include token usage statistics in the response'
-    })
-  },
+export interface SimpleLLMCallParams {
+  provider?: 'openai' | 'ollama';
+  apiKey?: string;
+  model?: string;
+  systemPrompt?: string;
+  userPrompt: string;
+  temperature?: number;
+  maxTokens?: number;
+  includeUsage?: boolean;
+}
 
-  async run(context) {
-    const { apiKey, model, systemPrompt, userPrompt, temperature, maxTokens, includeUsage } = context.propsValue;
-    
-    try {
-      const openai = new OpenAI({
-        apiKey: apiKey
-      });
+export interface LLMCallResult {
+  success: boolean;
+  result: {
+    content: string;
+    model: string;
+    timestamp: string;
+    usage?: any;
+  };
+  message: string;
+}
 
-      const messages: any[] = [];
-      
-      if (systemPrompt) {
-        messages.push({
-          role: 'system',
-          content: systemPrompt
-        });
+export async function simpleLLMCall(params: SimpleLLMCallParams): Promise<LLMCallResult> {
+  const {
+    provider = 'ollama',
+    apiKey,
+    model = provider === 'ollama' ? 'granite4:3b' : 'gpt-4',
+    systemPrompt,
+    userPrompt,
+    temperature = 0.7,
+    maxTokens = 1000,
+    includeUsage = true
+  } = params;
+
+  try {
+    const providerManager = new LLMProviderManager();
+
+    // Configure provider based on type
+    if (provider === 'openai') {
+      if (!apiKey) {
+        throw new Error('OpenAI API key is required');
       }
-      
-      messages.push({
-        role: 'user',
-        content: userPrompt
+      providerManager.addProvider({
+        name: 'openai',
+        type: LLMProviderType.OPENAI,
+        apiKey,
+        model
       });
-
-      const response = await openai.chat.completions.create({
-        model: model,
-        messages: messages,
-        temperature: temperature || 0.7,
-        max_tokens: maxTokens || 1000
+    } else if (provider === 'ollama') {
+      providerManager.addProvider({
+        name: 'ollama',
+        type: LLMProviderType.LOCAL_AI,
+        baseUrl: 'http://localhost:11434',
+        model
       });
-
-      const result = {
-        content: response.choices[0]?.message?.content || '',
-        model: response.model,
-        timestamp: new Date().toISOString(),
-        usage: includeUsage ? response.usage : undefined
-      };
-
-      return {
-        success: true,
-        result,
-        message: 'LLM call completed successfully'
-      };
-      
-    } catch (error) {
-      throw new Error(`LLM call failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } else {
+      throw new Error(`Unsupported provider: ${provider}`);
     }
+
+    const messages: any[] = [];
+
+    if (systemPrompt) {
+      messages.push({
+        role: 'system',
+        content: systemPrompt
+      });
+    }
+
+    messages.push({
+      role: 'user',
+      content: userPrompt
+    });
+
+    const response = await providerManager.callProvider(
+      provider,
+      provider === 'openai' ? LLMProviderType.OPENAI : LLMProviderType.LOCAL_AI,
+      messages,
+      model,
+      {
+        temperature,
+        max_tokens: maxTokens
+      }
+    );
+
+    const result = {
+      content: response.content,
+      model: response.model,
+      timestamp: new Date().toISOString(),
+      usage: includeUsage ? response.usage : undefined
+    };
+
+    return {
+      success: true,
+      result,
+      message: 'LLM call completed successfully'
+    };
+
+  } catch (error) {
+    throw new Error(`LLM call failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-});
+}

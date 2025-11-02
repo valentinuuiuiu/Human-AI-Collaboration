@@ -10,9 +10,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@activepieces/pieces-common": "workspace:*",
-    "@activepieces/pieces-framework": "workspace:*",
-    "@activepieces/shared": "workspace:*",
     "openai": "^4.20.1",
     "@anthropic-ai/sdk": "^0.24.3",
     "uuid": "^9.0.0",

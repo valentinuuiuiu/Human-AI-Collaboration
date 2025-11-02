@@ -1,6 +1,6 @@
 export interface LLMProvider {
   name: string;
-  apiKey: string;
+  apiKey?: string;
   baseUrl?: string;
   model?: string;
 }

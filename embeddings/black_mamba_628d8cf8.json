@@ -1,0 +1,19 @@
+{
+  "id": "628d8cf8",
+  "task_type": "debugging",
+  "content_hash": "e53fec429aba4e8c0be967ad80e7a6b841f2269e7f9e5ef9fd42fad1401569c3",
+  "mamba_confidence": 0.5721655269759087,
+  "state_relevance": 0.2721655269759087,
+  "paralyzing_precision": false,
+  "queen_blessing": true,
+  "key_insights": [
+    "**Understand the Problem**:",
+    "Ask for specific symptoms such as app crashes, slow performance over time, or unresponsive UI.",
+    "Note any error messages related to memory issues.",
+    "**Gather Context**:",
+    "Request the relevant code snippet(s) of the component in question."
+  ],
+  "mamba_insights": "Systematic approach - Queen's ordered wisdom",
+  "created": "2025-11-02T08:52:57.082612",
+  "usage_count": 0
+}

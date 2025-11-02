@@ -1,0 +1,22 @@
+{
+  "id": "42a9b850",
+  "task_type": "code_review",
+  "content_hash": "38ff8e313a92c27df6831d8292be52713bffb9b5c53341315d250a5f29e82b8b",
+  "mamba_confidence": 0.09141337126493454,
+  "state_relevance": 0.0,
+  "patterns": [
+    "error_handling",
+    "system_design",
+    "security_focus"
+  ],
+  "key_insights": [
+    "*What the issue is:**",
+    "*Why it matters:**",
+    "*How to fix it:**",
+    "*What the issue is:**",
+    "*Why it matters:**"
+  ],
+  "mamba_insights": "Low confidence - needs more context",
+  "created": "2025-11-02T08:51:08.114165",
+  "usage_count": 0
+}

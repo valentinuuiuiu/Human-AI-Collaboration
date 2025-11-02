@@ -1,0 +1,234 @@
+{
+  "learning_patterns": {
+    "code_review": [
+      {
+        "timestamp": "2025-11-02T08:51:08.114069",
+        "input_length": 524,
+        "response_length": 4412,
+        "latency": 17.407755374908447,
+        "complexity": "medium",
+        "mamba_confidence": 0.09141337126493454,
+        "state_relevance": 0.0,
+        "patterns_recognized": [
+          "error_handling",
+          "system_design",
+          "security_focus"
+        ],
+        "successful_approach": "Provided structured guidance",
+        "mamba_insights": "Low confidence - needs more context"
+      }
+    ],
+    "debugging": [
+      {
+        "timestamp": "2025-11-02T08:51:22.693534",
+        "input_length": 140,
+        "response_length": 4004,
+        "latency": 14.578713178634644,
+        "complexity": "low",
+        "mamba_confidence": 0.08600471541285515,
+        "state_relevance": 0.0,
+        "patterns_recognized": [
+          "performance_issue"
+        ],
+        "successful_approach": "Provided structured guidance",
+        "mamba_insights": "Low confidence - needs more context"
+      }
+    ],
+    "architecture": [
+      {
+        "timestamp": "2025-11-02T08:51:40.029689",
+        "input_length": 148,
+        "response_length": 5376,
+        "latency": 17.335127592086792,
+        "complexity": "low",
+        "mamba_confidence": 0.07692499086260796,
+        "state_relevance": 0.0,
+        "patterns_recognized": [
+          "system_design"
+        ],
+        "successful_approach": "Provided multiple solution alternatives",
+        "mamba_insights": "Low confidence - needs more context"
+      }
+    ],
+    "testing": [
+      {
+        "timestamp": "2025-11-02T08:51:49.740342",
+        "input_length": 133,
+        "response_length": 2772,
+        "latency": 9.709928274154663,
+        "complexity": "low",
+        "mamba_confidence": 0.07988486438989639,
+        "state_relevance": 0.0,
+        "patterns_recognized": [
+          "security_focus"
+        ],
+        "successful_approach": "Focused on security analysis",
+        "mamba_insights": "Security vulnerability assessment effective; Low confidence - needs more context"
+      }
+    ]
+  },
+  "knowledge_embeddings": {
+    "42a9b850": {
+      "id": "42a9b850",
+      "task_type": "code_review",
+      "content_hash": "38ff8e313a92c27df6831d8292be52713bffb9b5c53341315d250a5f29e82b8b",
+      "mamba_confidence": 0.09141337126493454,
+      "state_relevance": 0.0,
+      "patterns": [
+        "error_handling",
+        "system_design",
+        "security_focus"
+      ],
+      "key_insights": [
+        "*What the issue is:**",
+        "*Why it matters:**",
+        "*How to fix it:**",
+        "*What the issue is:**",
+        "*Why it matters:**"
+      ],
+      "mamba_insights": "Low confidence - needs more context",
+      "created": "2025-11-02T08:51:08.114165",
+      "usage_count": 0
+    },
+    "9a5a8b74": {
+      "id": "9a5a8b74",
+      "task_type": "debugging",
+      "content_hash": "33ccd59ea42f3ae2af5f9dcc43aaaadeb3751a0876e066bd4797d6bdb9195a35",
+      "mamba_confidence": 0.08600471541285515,
+      "state_relevance": 0.0,
+      "patterns": [
+        "performance_issue"
+      ],
+      "key_insights": [
+        "**Understand the Problem**:",
+        "Symptoms: Slow rendering, high memory usage in browser developer tools, unresponsive UI.",
+        "Error Messages: Not specified in the prompt.",
+        "**Gather Context**:",
+        "Relevant Code: Please share the code snippet of your React component, especially around useEffects, event listeners, and complex state management."
+      ],
+      "mamba_insights": "Low confidence - needs more context",
+      "created": "2025-11-02T08:51:22.693699",
+      "usage_count": 0
+    },
+    "103b6a3b": {
+      "id": "103b6a3b",
+      "task_type": "architecture",
+      "content_hash": "4ee30eccd55203fb4cf015cd37ab801837352d855d1ba7223d10ded2eb649846",
+      "mamba_confidence": 0.07692499086260796,
+      "state_relevance": 0.0,
+      "patterns": [
+        "system_design"
+      ],
+      "key_insights": [
+        "API Gateway:",
+        "Use an API gateway as the entry point for all client requests.",
+        "It handles authentication, rate limiting, request routing, and protocol translation (e.g., HTTP/HTTPS).",
+        "Examples: Kong, Apigee, AWS API Gateway.",
+        "Service Discovery:"
+      ],
+      "mamba_insights": "Low confidence - needs more context",
+      "created": "2025-11-02T08:51:40.029775",
+      "usage_count": 0
+    },
+    "e4745794": {
+      "id": "e4745794",
+      "task_type": "testing",
+      "content_hash": "f9acb7b50909d3303a75acc84898a3d559752a16b6f2048e157433fc96e03720",
+      "mamba_confidence": 0.07988486438989639,
+      "state_relevance": 0.0,
+      "patterns": [
+        "security_focus"
+      ],
+      "key_insights": [
+        "Test individual components like controllers, services, repositories",
+        "Validate business logic and algorithms in each component",
+        "Mock dependencies (e.g. database) to isolate code under test",
+        "Verify interactions between multiple API components/services",
+        "Test that data flows correctly through the request/response pipeline"
+      ],
+      "mamba_insights": "Security vulnerability assessment effective; Low confidence - needs more context",
+      "created": "2025-11-02T08:51:49.740422",
+      "usage_count": 0
+    }
+  },
+  "state_memory": {
+    "20251102_085108": {
+      "timestamp": "2025-11-02T08:51:08.114289",
+      "user_input": "Review this authentication middleware for security vulnerabilities\n\n```javascript\n\nfunction authenticateUser(req, res, next) {\n    const token = req.headers.authorization?.split(' ')[1];\n    if (!token) return res.status(401).json({ error: 'No token provided' });\n    try {\n        const decoded = jwt.verify(token, process.env.JWT_SECRET);\n        req.user = decoded;\n        next();\n    } catch (error) {\n        return res.status(401).json({ error: 'Invalid token' });\n    }\n}\n\n```\n\nContext: Node.js authentication system",
+      "ai_response": "CODE REVIEW SPECIALIST MODE\n\nThis is a good start for an authentication middleware in a Node.js application. Let's go through it step by step and identify areas that could be improved from a security perspective.\n\n### 1. Token Extraction Logic\n```javascript\nconst token = req.headers.authorization?.split(' ')[1];\n```\n**What the issue is:**  \nThe code assumes the token is always in the `Authorization` header with the format `\"Bearer <token>\"`. If the header is missing or malformed, this will throw an error.\n\n**Why it matters:**  \nIf an attacker can bypass the validation (e.g., by modifying the request headers), they could gain unauthorized access to protected routes.\n\n**How to fix it:**  \nValidate that the `Authorization` header exists and follows the expected format before attempting to extract the token.\n```javascript\nif (!req.headers.authorization || !/^(Bearer\\s+)[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]$/i.test(req.headers.authorization)) {\n    return res.status(401).json({ error: 'Invalid token' });\n}\nconst token = req.headers.authorization.split(' ')[1];\n```\n\n### 2. Token Verification\n```javascript\nconst decoded = jwt.verify(token, process.env.JWT_SECRET);\n```\n**What the issue is:**  \nThe verification uses a hardcoded environment variable `JWT_SECRET`. If this secret leaks (e.g., through logs or config files), an attacker could forge tokens.\n\n**Why it matters:**  \nA compromised secret allows attackers to generate valid JWTs and access protected resources without proper authorization.\n\n**How to fix it:**  \nUse a secure, encrypted method for storing the secret. Consider using AWS Secrets Manager, HashiCorp Vault, or environment variables that are not exposed in logs.\n```javascript\nconst jwt = require('jsonwebtoken');\nconst JWT_SECRET = process.env.JWT_SECRET;\n```\n\n### 3. Error Handling\nThe middleware already handles errors by returning a `401 Unauthorized` response.\n\n**Why it matters:**  \nProper error handling prevents leaking of internal details that could aid attackers (e.g., \"Invalid token\" vs. generic \"Unauthorized\").\n\n**How to fix it:**  \nKeep the current approach, but ensure all potential paths are covered and logged securely without exposing secrets.\n```javascript\ncatch (error) {\n    console.error('Authentication failed:', error);\n    return res.status(401).json({ error: 'Invalid token' });\n}\n```\n\n### 4. Security Headers\nThe middleware does not set any security headers like `Content-Security-Policy`, `X-Frame-Options`, or `X-XSS-Protection`.\n\n**Why it matters:**  \nThese headers can mitigate common web vulnerabilities such as clickjacking and cross-site scripting.\n\n**How to fix it:**  \nAdd these headers in the response if possible.\n```javascript\nres.setHeader('Content-Security-Policy', 'default-src \\'self\\'');\nres.setHeader('X-Frame-Options', 'DENY');\nres.setHeader('X-XSS-Protection', '1; mode=block');\n```\n\n### 5. Token Expiration and Revocation\nThe middleware does not handle token expiration or revocation.\n\n**What the issue is:**  \nIf a token has expired, it will still be accepted as valid unless explicitly checked.\n\n**Why it matters:**  \nExpired tokens can be used for session fixation attacks if they are not properly invalidated.\n\n**How to fix it:**  \nCheck the `exp` claim in the JWT payload.\n```javascript\nif (decoded.exp < Math.floor(Date.now() / 1000)) {\n    return res.status(401).json({ error: 'Token expired' });\n}\n```\n\n### 6. Input Validation and Sanitization\nThe middleware does not perform any input validation or sanitization on the `Authorization` header.\n\n**Why it matters:**  \nMalformed tokens could lead to unexpected behavior in the application, such as crashes or insecure deserialization.\n\n**How to fix it:**  \nEnsure the token is properly validated before processing.\n```javascript\nif (!/^(Bearer\\s+)[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]$/i.test(req.headers.authorization)) {\n    return res.status(401).json({ error: 'Invalid token' });\n}\n```\n\n### 7. Logging and Monitoring\nThe middleware does not log authentication attempts or errors.\n\n**Why it matters:**  \nLogging helps detect brute-force attacks, token abuse, or other security incidents.\n\n**How to fix it:**  \nLog successful and failed authentications securely.\n```javascript\nif (!token) {\n    console.error('Authentication failure (no token)', req.ip);\n    return res.status(401).json({ error: 'No token provided' });\n}\ntry {\n    // ...\n} catch (error) {\n",
+      "task_type": "code_review",
+      "mamba_confidence": 0.09141337126493454,
+      "state_relevance": 0.0,
+      "patterns_recognized": [
+        "error_handling",
+        "system_design",
+        "security_focus"
+      ],
+      "success": true,
+      "latency": 17.41,
+      "keywords": [
+        "review",
+        "function"
+      ]
+    },
+    "20251102_085122": {
+      "timestamp": "2025-11-02T08:51:22.693878",
+      "user_input": "My React component has memory leaks and performance issues\n\nContext: Component uses useEffect, event listeners, and complex state management",
+      "ai_response": "To debug memory leaks and optimize the performance of your React component, let's follow a systematic approach:\n\n1. **Understand the Problem**:\n   - Symptoms: Slow rendering, high memory usage in browser developer tools, unresponsive UI.\n   - Error Messages: Not specified in the prompt.\n\n2. **Gather Context**:\n   - Relevant Code: Please share the code snippet of your React component, especially around useEffects, event listeners, and complex state management.\n   - Logs: Any console logs or error messages that might indicate issues.\n   - System Information: Browser being used (Chrome, Firefox), version of React.\n\n3. **Hypothesize**:\n   - Common Causes for Memory Leaks in React Components:\n     1. Uncontrolled/unmanaged state leading to unnecessary re-renders.\n     2. Event listeners registered without cleanup functions.\n     3. useEffect callbacks not properly handling side effects or cleanups.\n     4. Complex data structures causing excessive memory usage during renders.\n\n   - Potential Performance Issues:\n     1. High nesting of components leading to inefficient reconciliation.\n     2. Excessive state updates triggering unnecessary re-renders.\n     3. Large datasets being processed without optimization (e.g., virtualization).\n\n4. **Test Hypotheses**:\n\n   **a. Event Listeners and Cleanup**:\n      - Ensure all event listeners are registered inside useEffect with cleanup functions using `useEffect(() => {\n        const listener = () => {/* do something */}\n        return () => { removeListener };\n      }, []);` for dependencies array being empty.\n\n   **b. State Management**:\n      - Review the state structure to ensure it's minimal and efficient.\n      - Consider using React.memo or PureComponent to prevent unnecessary renders.\n      - Use `useCallback` for functions passed as props to avoid re-creating them on every render.\n\n   **c. useEffect Dependencies**:\n      - List all dependencies in your useEffect calls explicitly (e.g., `[prop1, prop2]`) to ensure the hook only runs when necessary.\n      - Avoid using state or props as dependencies if they don't trigger a rerender.\n\n   **d. Profiling Tools**:\n      - Use browser's developer tools (React DevTools) to identify components with high memory usage and frequent re-renders.\n      - Look for \"Suspense List\" in the profiler to see if any component is stuck waiting for data or updates.\n\n5. **Verify Solutions**:\n\n   **a. Clean Up Event Listeners**:\n      - Ensure all event listeners are properly cleaned up by defining them inside useEffect with cleanup functions.\n\n   **b. Optimize State Usage**:\n      - Use `React.memo` for functional components that receive the same props and render quickly.\n      - Minimize state updates; batch multiple updates into a single re-render using `setState([...])`.\n\n   **c. Cleanup Unused Effects**:\n      - Remove any useEffects that are not necessary or are causing unnecessary side effects.\n\n   **d. Profile After Changes**:\n      - Re-run the performance profiler after making changes.\n      - Ensure memory usage stabilizes and there are no leaks in the updated component.\n\n### Example Code Adjustments\n\n**Before:**\n```jsx\nuseEffect(() => {\n  const listener = () => {/* function */}\n  window.addEventListener('resize', listener);\n}, []);\n```\n\n**After (with Cleanup):**\n```jsx\nuseEffect(() => {\n  const listener = () => {/* function */}\n  return () => { window.removeEventListener('resize', listener); };\n}, [/* dependencies */]);\n```\n\n### Additional Tips\n\n- **Avoid Global State**: If possible, limit global state usage as it can lead to memory leaks and make profiling harder.\n- **Use Context Wisely**: Only use React.Context if necessary; each context provider adds a bit of overhead.\n- **Leverage `useReducer` for Complex Logic**: Reducers can be more predictable than managing complex state logic directly in components.\n\nBy systematically applying these steps, you should be able to identify and resolve the memory leaks and performance issues in your React component.",
+      "task_type": "debugging",
+      "mamba_confidence": 0.08600471541285515,
+      "state_relevance": 0.0,
+      "patterns_recognized": [
+        "performance_issue"
+      ],
+      "success": true,
+      "latency": 14.58,
+      "keywords": []
+    },
+    "20251102_085140": {
+      "timestamp": "2025-11-02T08:51:40.029896",
+      "user_input": "Design microservices for high-traffic e-commerce platform\n\nRequirements: 10k+ concurrent users, real-time inventory, secure payments, global scaling",
+      "ai_response": "To design a scalable and maintainable microservices architecture for a high-traffic e-commerce platform with the given requirements, we need to consider several key aspects. Here's an architectural approach:\n\n1. API Gateway:\n   - Use an API gateway as the entry point for all client requests.\n   - It handles authentication, rate limiting, request routing, and protocol translation (e.g., HTTP/HTTPS).\n   - Examples: Kong, Apigee, AWS API Gateway.\n\n2. Service Discovery:\n   - Implement a service discovery mechanism to enable dynamic registration and lookup of microservices.\n   - Consul or Eureka can be used for this purpose.\n\n3. Microservice Segmentation:\n   - Break down the monolithic application into several independent microservices based on bounded contexts and business capabilities.\n   - Some key microservices include:\n     - Product Catalog Service\n     - Inventory Management Service\n     - Order Processing Service\n     - Payment Service\n     - User Authentication Service\n     - Recommendation Engine Service\n\n4. Real-time Inventory:\n   - Use a distributed in-memory data grid (e.g., Redis) for real-time inventory management.\n   - When an item is added to the cart or purchased, update the inventory count atomically using Redis commands like INCR.\n   - This ensures consistent and low-latency updates across multiple services.\n\n5. Payment Service:\n   - Integrate with a reliable payment gateway (e.g., Stripe, PayPal) for secure payments processing.\n   - Use asynchronous messaging (e.g., message queue like RabbitMQ or Kafka) to decouple the order processing from payment handling.\n   - Implement idempotency and retry mechanisms to handle failures gracefully.\n\n6. Distributed Database:\n   - Use a distributed database system (e.g., Cassandra, MongoDB) for storing product catalogs, inventory data, and user information.\n   - This allows horizontal scaling and high availability across multiple nodes.\n   - Consider using sharding techniques to distribute the data based on keys like productId or userId.\n\n7. Caching Layer:\n   - Implement a caching layer using Redis or Memcached to reduce database load and improve response times for frequently accessed data.\n   - Cache product details, user profiles, and other read-heavy data at the application level.\n\n8. Asynchronous Processing:\n   - Use message queues (e.g., RabbitMQ, Kafka) for asynchronous processing of time-consuming tasks like email notifications, order fulfillment, or inventory updates.\n   - This helps in decoupling different components and improves overall system responsiveness.\n\n9. Containerization and Orchestration:\n   - Package each microservice into a container using Docker.\n   - Use container orchestration platforms like Kubernetes to manage the deployment, scaling, and networking of containers across multiple nodes.\n   - Kubernetes provides features like auto-scaling, load balancing, and service discovery.\n\n10. Monitoring and Logging:\n    - Implement centralized logging (e.g., ELK stack) to collect and analyze logs from all microservices for troubleshooting and debugging purposes.\n    - Use distributed tracing tools (e.g., Jaeger, Zipkin) to trace requests across multiple services and identify performance bottlenecks.\n    - Set up monitoring dashboards to track key metrics like request latency, error rates, CPU/memory usage, etc.\n\n11. Security:\n    - Implement authentication and authorization mechanisms using OAuth2 or JWT tokens.\n    - Use HTTPS for secure communication between clients and microservices.\n    - Encrypt sensitive data at rest (e.g., credit card information) and in transit.\n    - Regularly update dependencies and libraries to patch security vulnerabilities.\n\nTrade-offs and Alternatives:\n- Using a distributed database like Cassandra may require more complex querying capabilities compared to traditional relational databases. Consider using a hybrid approach with both Cassandra for high-volume write operations and a relational database (e.g., PostgreSQL) for structured queries.\n- Implementing message queues adds complexity but provides better scalability and fault tolerance. Alternatively, you can use synchronous communication patterns if low latency is critical.\n\nImplementation Guidance:\n1. Set up the API gateway to route requests to the appropriate microservices based on the endpoint.\n2. Define RESTful APIs or gRPC services for each microservice to ensure clear boundaries and maintainability.\n3. Implement service discovery using Consul or Eureka, allowing services to find and communicate with each other dynamically.\n4. Design the inventory management system to handle real-time updates efficiently using Redis.\n5. Integrate with a reliable payment gateway and implement asynchronous processing for payment-related tasks.\n6. Choose an appropriate distributed database based on your requirements (e.g., Cassandra for high write throughput, MongoDB for flexible schema).\n7. Set up caching layers using Redis or Memcached to optimize performance for frequently accessed data.\n8. Containerize each microservice using Docker and deploy them using Kubernetes for scalability and resilience.\n9. Implement centralized logging and monitoring systems to track application health and diagnose issues effectively.\n10. Follow security best practices like encryption, secure communication protocols, and regular updates to protect sensitive user",
+      "task_type": "architecture",
+      "mamba_confidence": 0.07692499086260796,
+      "state_relevance": 0.0,
+      "patterns_recognized": [
+        "system_design"
+      ],
+      "success": true,
+      "latency": 17.34,
+      "keywords": [
+        "design"
+      ]
+    },
+    "20251102_085149": {
+      "timestamp": "2025-11-02T08:51:49.740574",
+      "user_input": "Create comprehensive testing strategy for REST API\n\nContext: User management, authentication, payments, and data validation endpoints",
+      "ai_response": "Here is a comprehensive testing strategy for the REST API covering user management, authentication, payments, and data validation:\n\nUnit Tests:\n1. Test individual components like controllers, services, repositories \n2. Validate business logic and algorithms in each component\n3. Mock dependencies (e.g. database) to isolate code under test\n4. Cover happy path scenarios as well as error handling paths\n\nIntegration Tests:  \n1. Verify interactions between multiple API components/services\n2. Test that data flows correctly through the request/response pipeline\n3. Ensure proper authentication and authorization are enforced \n4. Validate consistency of state across database, caches, queues, etc.\n\nEnd-to-End (E2E) Tests:\n1. Simulate real user journeys and workflows across APIs  \n2. Perform tests for full end-to-end scenarios like creating a new account,\n   logging in, making a payment, updating profile info, etc.\n3. Use tools like Postman or Cypress to automate these flows\n4. Validate UI behavior as well if the API is consumed by web/mobile apps\n\nPerformance Tests:\n1. Load test APIs under expected concurrent user loads \n2. Measure response times and throughput for each endpoint\n3. Identify bottlenecks in code, database queries, external services\n4. Optimize slow paths to meet SLA requirements (e.g. <200ms API latency)\n\nSecurity Tests:  \n1. Perform penetration testing on all endpoints\n2. Validate authentication tokens are properly validated \n3. Check for common vulnerabilities like SQL injection, XSS\n4. Test that sensitive data is encrypted in transit and at rest\n\nEdge Cases:\n1. Verify proper handling of invalid or malformed input data\n2. Test API behavior with boundary values (e.g. max/min IDs)\n3. Validate error responses are informative yet not exposing internal details  \n4. Confirm idempotency of write operations like creating accounts\n\nDocumentation:\n1. Document expected request/response formats for each endpoint\n2. Clearly define required/optional parameters and their constraints \n3. Specify authentication requirements per API\n4. List all potential errors with example payloads\n\nTesting Process:\n1. Establish a CI pipeline that runs unit, integration and performance tests on every commit\n2. Execute E2E tests manually or semi-automated via tools like Selenium\n3. Perform security scans using static analysis and dynamic vulnerability scanners \n4. Review test coverage metrics to ensure all critical paths are tested\n5. Maintain and evolve the test suites as APIs change over time\n\nBy covering these aspects, you can develop a robust testing strategy that ensures high quality, reliability and security of your REST API across user management, authentication, payments and data validation features. Let me know if you have any other questions!",
+      "task_type": "testing",
+      "mamba_confidence": 0.07988486438989639,
+      "state_relevance": 0.0,
+      "patterns_recognized": [
+        "security_focus"
+      ],
+      "success": true,
+      "latency": 9.71,
+      "keywords": [
+        "api"
+      ]
+    }
+  },
+  "mamba_config": {
+    "d_model": 256,
+    "d_state": 64,
+    "embedding_dim": 256
+  },
+  "metadata": {
+    "model": "granite4:3b",
+    "last_updated": "2025-11-02T08:51:49.740615",
+    "total_interactions": 4,
+    "learned_patterns": 4,
+    "active_embeddings": 4,
+    "state_memory_size": 4
+  }
+}

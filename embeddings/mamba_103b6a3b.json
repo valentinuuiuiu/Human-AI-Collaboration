@@ -1,0 +1,20 @@
+{
+  "id": "103b6a3b",
+  "task_type": "architecture",
+  "content_hash": "4ee30eccd55203fb4cf015cd37ab801837352d855d1ba7223d10ded2eb649846",
+  "mamba_confidence": 0.07692499086260796,
+  "state_relevance": 0.0,
+  "patterns": [
+    "system_design"
+  ],
+  "key_insights": [
+    "API Gateway:",
+    "Use an API gateway as the entry point for all client requests.",
+    "It handles authentication, rate limiting, request routing, and protocol translation (e.g., HTTP/HTTPS).",
+    "Examples: Kong, Apigee, AWS API Gateway.",
+    "Service Discovery:"
+  ],
+  "mamba_insights": "Low confidence - needs more context",
+  "created": "2025-11-02T08:51:40.029775",
+  "usage_count": 0
+}

@@ -1,0 +1,20 @@
+{
+  "id": "e4745794",
+  "task_type": "testing",
+  "content_hash": "f9acb7b50909d3303a75acc84898a3d559752a16b6f2048e157433fc96e03720",
+  "mamba_confidence": 0.07988486438989639,
+  "state_relevance": 0.0,
+  "patterns": [
+    "security_focus"
+  ],
+  "key_insights": [
+    "Test individual components like controllers, services, repositories",
+    "Validate business logic and algorithms in each component",
+    "Mock dependencies (e.g. database) to isolate code under test",
+    "Verify interactions between multiple API components/services",
+    "Test that data flows correctly through the request/response pipeline"
+  ],
+  "mamba_insights": "Security vulnerability assessment effective; Low confidence - needs more context",
+  "created": "2025-11-02T08:51:49.740422",
+  "usage_count": 0
+}

@@ -1,0 +1,6 @@
+torch>=2.0.0
+transformers>=4.30.0
+peft>=0.4.0
+datasets>=2.10.0
+ollama>=0.1.7
+accelerate>=0.20.0

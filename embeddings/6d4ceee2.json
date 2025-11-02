@@ -1,0 +1,14 @@
+{
+  "id": "6d4ceee2",
+  "task_type": "debugging",
+  "content_hash": "dc4ffaf4e19843bf1c91d114067c77d55c8bbe315de641f55dd82f3813d7b95b",
+  "key_insights": [
+    "**Symptoms**: The app feels sluggish (janky animations, delayed responses), UI updates are not smooth, or there's unresponsive behavior.",
+    "**Error Messages**: Look for any specific error messages in your browser console related to memory or performance.",
+    "**Reproduction Steps**: Can you consistently reproduce the slowdown? If yes, note what triggers it (e.g., opening a specific page, scrolling).",
+    "**Code and Logs**: Share relevant parts of your code that use `useEffect` and handle event listeners.",
+    "**System Information**: Browser version, React and related library versions."
+  ],
+  "created": "2025-11-02T08:45:29.126568",
+  "usage_count": 0
+}

@@ -1,0 +1,14 @@
+{
+  "id": "d67c5cf3",
+  "task_type": "debugging",
+  "content_hash": "1ad29e7f8e913078a7b10c2ffb2042ff37b87b456fd3d7be7396b36b2bb0e1df",
+  "key_insights": [
+    "**Symptoms**: The app is slow to respond (e.g., delayed rendering of UI), high CPU or memory usage, flickering, or unresponsive state.",
+    "**Error Messages**: Look for any console errors related to memory leaks or excessive event listener registrations.",
+    "**Reproduction Steps**: Describe how the issue can be reproduced, including specific actions that trigger slowness.",
+    "**Code Snippet**: Provide a minimal reproducible example of the problematic component using `useEffect` and event listeners.",
+    "**Logs and Console Errors**: Check browser console for any errors or warnings related to performance."
+  ],
+  "created": "2025-11-02T08:46:21.689953",
+  "usage_count": 0
+}

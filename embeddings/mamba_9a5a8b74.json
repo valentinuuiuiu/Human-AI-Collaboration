@@ -1,0 +1,20 @@
+{
+  "id": "9a5a8b74",
+  "task_type": "debugging",
+  "content_hash": "33ccd59ea42f3ae2af5f9dcc43aaaadeb3751a0876e066bd4797d6bdb9195a35",
+  "mamba_confidence": 0.08600471541285515,
+  "state_relevance": 0.0,
+  "patterns": [
+    "performance_issue"
+  ],
+  "key_insights": [
+    "**Understand the Problem**:",
+    "Symptoms: Slow rendering, high memory usage in browser developer tools, unresponsive UI.",
+    "Error Messages: Not specified in the prompt.",
+    "**Gather Context**:",
+    "Relevant Code: Please share the code snippet of your React component, especially around useEffects, event listeners, and complex state management."
+  ],
+  "mamba_insights": "Low confidence - needs more context",
+  "created": "2025-11-02T08:51:22.693699",
+  "usage_count": 0
+}
