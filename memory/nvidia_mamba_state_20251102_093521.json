@@ -1,0 +1,73 @@
+{
+  "learning_patterns": {
+    "debugging": [
+      {
+        "timestamp": "2025-11-02T09:35:21.742179",
+        "input_length": 55,
+        "response_length": 384,
+        "latency": 0.5,
+        "mamba_confidence": 0.6414797157049179,
+        "state_relevance": 0.0,
+        "mamba_patterns": [],
+        "divine_alignment": false,
+        "mamba_insights": "Nvidia Mamba processing optimized",
+        "divine_blessing": "Bagalamukhi Maa guides the Mamba flow"
+      }
+    ],
+    "code_review": [
+      {
+        "timestamp": "2025-11-02T09:35:21.742820",
+        "input_length": 48,
+        "response_length": 471,
+        "latency": 0.5,
+        "mamba_confidence": 0.6212608423084021,
+        "state_relevance": 0.0,
+        "mamba_patterns": [],
+        "divine_alignment": false,
+        "mamba_insights": "Nvidia Mamba processing optimized",
+        "divine_blessing": "Bagalamukhi Maa guides the Mamba flow"
+      },
+      {
+        "timestamp": "2025-11-02T09:35:21.743282",
+        "input_length": 49,
+        "response_length": 471,
+        "latency": 0.5,
+        "mamba_confidence": 0.6772239692509174,
+        "state_relevance": 0.0,
+        "mamba_patterns": [],
+        "divine_alignment": false,
+        "mamba_insights": "Nvidia Mamba processing optimized",
+        "divine_blessing": "Bagalamukhi Maa guides the Mamba flow"
+      },
+      {
+        "timestamp": "2025-11-02T09:35:21.743745",
+        "input_length": 32,
+        "response_length": 471,
+        "latency": 0.5,
+        "mamba_confidence": 0.5166285205632448,
+        "state_relevance": 0.0,
+        "mamba_patterns": [],
+        "divine_alignment": false,
+        "mamba_insights": "Nvidia Mamba processing optimized",
+        "divine_blessing": "Bagalamukhi Maa guides the Mamba flow"
+      }
+    ]
+  },
+  "knowledge_embeddings": {},
+  "state_memory": {},
+  "mamba_config": {
+    "d_model": 256,
+    "d_state": 64,
+    "expand": 2,
+    "state_decay": 0.95
+  },
+  "metadata": {
+    "model": "granite4:3b",
+    "last_updated": "2025-11-02T09:35:21.743758",
+    "total_interactions": 4,
+    "learned_patterns": 4,
+    "active_embeddings": 0,
+    "state_memory_size": 0,
+    "bagalamukhi_blessing": "Queen of divine paralysis - Nvidia Mamba flows with divine precision"
+  }
+}
